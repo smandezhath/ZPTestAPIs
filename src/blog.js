@@ -9,34 +9,21 @@ const router = express.Router();
 
 // Create a new blog
 router.post("/", (req, res) => {
-  debugger;
-  // Validate request
-  //   if (!req.body.title) {
-  //     res.status(400).send({ message: "Content cannot be empty!" });
-  //     return;
-  //   }
+  if (!req.body) {
+    return res.status(400).send({
+      message: "Data can not be empty!",
+    });
+  }
 
-  // Create a Blog
-  // const blog = new Blog({
-  //   title: req.body.title,
-  //   category: req.body.category,
-  //   // image: req.body.image,
-  //   content: req.body.content,
-  //   signature: req.body.signature,
-  //   reviewed: req.body.reviewed,
-  //   approved: req.body.approved,
-  // });
+  var data = JSON.parse(new TextDecoder().decode(req.body));
 
-  const blog = new Blog({
-    title: "title",
-    category: "category",
-    content: "content",
-    signature: "signature",
-    reviewed: false,
-    approved: false,
-  });
+  if (!data.title) {
+    res.status(400).send({ message: "title cannot be empty!" });
+    return;
+  }
 
-  // Save Blog in the database
+  const blog = new Blog(data);
+
   blog
     .save(blog)
     .then((data) => {
@@ -51,7 +38,6 @@ router.post("/", (req, res) => {
 
 // Retrieve all blog
 router.get("/", (req, res) => {
-  debugger;
   const title = req.query.title;
   var condition = title
     ? { title: { $regex: new RegExp(title), $options: "i" } }
@@ -108,7 +94,9 @@ router.put("/:id", (req, res) => {
 
   const id = req.params.id;
 
-  Blog.findByIdAndUpdate(id, req.body, { useFindAndModify: false })
+  var data = JSON.parse(new TextDecoder().decode(req.body));
+
+  Blog.findByIdAndUpdate(id, data, { useFindAndModify: false })
     .then((data) => {
       if (!data) {
         res.status(404).send({
@@ -145,12 +133,6 @@ router.delete("/:id", (req, res) => {
       });
     });
 });
-
-// router.get("/", (req, res) => {
-//   res.json({
-//     hello: "hi!",
-//   });
-// });
 
 app.use(`/.netlify/functions/blog`, router);
 
