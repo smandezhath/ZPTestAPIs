@@ -3,7 +3,6 @@ const dbConfig = require("../config/db.config");
 const mongoose = require("mongoose");
 mongoose.Promise = global.Promise;
 
-debugger;
 const db = {};
 db.mongoose = mongoose;
 db.url = dbConfig.url;
@@ -21,9 +20,10 @@ db.mongoose
     process.exit();
   });
 
-db.policies = require("./policy.model.js")(mongoose);
 db.blog = require("./blog.model.js")(mongoose);
 db.carreview = require("./carreview.model.js")(mongoose);
+db.restaurant = require("./restaurant.model.js")(mongoose);
 db.movierating = require("./movierating.model.js")(mongoose);
+db.shopping_cart = require("./shopping_cart.model.js")(mongoose);
 
 module.exports = db;
