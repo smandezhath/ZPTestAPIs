@@ -4,8 +4,14 @@ const serverless = require("serverless-http");
 const db = require("./models");
 const Blog = db.blog;
 
-const app = express();
 const router = express.Router();
+
+const cors = require("cors");
+
+const app = express();
+
+app.options("*", cors());
+app.use(cors());
 
 const fs = require("file-system");
 const multer = require("multer");
