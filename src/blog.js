@@ -75,6 +75,7 @@ router.post("/", upload.single("myImage"), (req, res) => {
 
 // Retrieve all blog
 router.get("/", (req, res) => {
+  debugger;
   const title = req.query.title;
   var condition = title
     ? { title: { $regex: new RegExp(title), $options: "i" } }
@@ -84,12 +85,14 @@ router.get("/", (req, res) => {
     .then((data) => {
       var result = {};
 
+      debugger;
+
       data.map((itm) => {
         result[itm.title] = {
           id: itm._id,
           title: itm.title,
           category: itm.category,
-          image: itm.image,
+          image: itm.image && itm.image.data && itm.image.data,
           content: itm.content,
           signature: itm.signature,
           reviewed: itm.reviewed,
@@ -109,12 +112,26 @@ router.get("/", (req, res) => {
 // Retrieve a single blog with id
 router.get("/:id", (req, res) => {
   const id = req.params.id;
-
+  debugger;
   Blog.findById(id)
     .then((data) => {
       if (!data)
         res.status(404).send({ message: "Not found Blog with id " + id });
-      else res.send(data);
+      else {
+        debugger;
+        var result = {
+          id: data._id.toString(),
+          title: data.title,
+          category: data.category,
+          image: data.image && data.image.data && data.image.data,
+          content: data.content,
+          signature: data.signature,
+          reviewed: data.reviewed,
+          approved: data.approved,
+        };
+
+        res.send(result);
+      }
     })
     .catch((err) => {
       res.status(500).send({ message: "Error retrieving Blog with id=" + id });
@@ -142,7 +159,7 @@ router.put("/:id", (req, res) => {
   let data = {
     title: req.body.title,
     category: req.body.category,
-    image: req.body.image,
+    image: finalImg,
     content: req.body.content,
     signature: req.body.signature,
     reviewed: req.body.reviewed,
