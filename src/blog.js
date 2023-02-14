@@ -10,8 +10,14 @@ const cors = require("cors");
 
 const app = express();
 
-app.options("*", cors());
-app.use(cors());
+app.use(
+  cors({
+    origin: "*",
+  })
+);
+
+// app.options("*", cors());
+// app.use(cors());
 
 const fs = require("file-system");
 const multer = require("multer");
