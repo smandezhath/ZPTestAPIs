@@ -3,6 +3,8 @@ const dbConfig = require("../config/db.config");
 const mongoose = require("mongoose");
 mongoose.Promise = global.Promise;
 
+const multer = require("multer");
+
 const db = {};
 db.mongoose = mongoose;
 db.url = dbConfig.url;

@@ -7,22 +7,47 @@ const Blog = db.blog;
 const app = express();
 const router = express.Router();
 
+const fs = require("file-system");
+const multer = require("multer");
+
+var storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, "uploads");
+  },
+  filename: function (req, file, cb) {
+    cb(null, file.fieldname + "-" + Date.now());
+  },
+});
+
+var upload = multer({ storage: storage });
+
 // Create a new blog
-router.post("/", (req, res) => {
+router.post("/", upload.single("myImage"), (req, res) => {
+  debugger;
   if (!req.body) {
     return res.status(400).send({
       message: "Data can not be empty!",
     });
   }
 
-  var data = JSON.parse(new TextDecoder().decode(req.body));
+  var img = fs.readFileSync(req.file.path);
+  var encode_image = img.toString("base64");
+  // Define a JSONobject for the image attributes for saving to database
 
-  if (!data.title) {
-    res.status(400).send({ message: "title cannot be empty!" });
-    return;
-  }
+  var finalImg = {
+    contentType: req.file.mimetype,
+    data: Buffer.from(encode_image, "base64"),
+  };
 
-  const blog = new Blog(data);
+  const blog = new Blog({
+    title: req.body.title,
+    category: req.body.category,
+    image: finalImg,
+    content: req.body.content,
+    signature: req.body.signature,
+    reviewed: req.body.reviewed,
+    approved: req.body.approved,
+  });
 
   blog
     .save(blog)
@@ -94,7 +119,23 @@ router.put("/:id", (req, res) => {
 
   const id = req.params.id;
 
-  var data = JSON.parse(new TextDecoder().decode(req.body));
+  var img = fs.readFileSync(req.file.path);
+  var encode_image = img.toString("base64");
+
+  var finalImg = {
+    contentType: req.file.mimetype,
+    image: Buffer.from(encode_image, "base64"),
+  };
+
+  let data = {
+    title: req.body.title,
+    category: req.body.category,
+    image: req.body.image,
+    content: req.body.content,
+    signature: req.body.signature,
+    reviewed: req.body.reviewed,
+    approved: req.body.approved,
+  };
 
   Blog.findByIdAndUpdate(id, data, { useFindAndModify: false })
     .then((data) => {

@@ -4,11 +4,27 @@ const serverless = require("serverless-http");
 const db = require("./models");
 const ShoppingCart = db.shopping_cart;
 
+const fs = require("file-system");
+
 const app = express();
 const router = express.Router();
 
+const multer = require("multer");
+
+var storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, "uploads");
+  },
+  filename: function (req, file, cb) {
+    cb(null, file.fieldname + "-" + Date.now());
+  },
+});
+
+var upload = multer({ storage: storage });
+
 // Create a new Policies
-router.post("/", (req, res) => {
+
+router.post("/", upload.single("myImage"), (req, res) => {
   debugger;
 
   if (!req.body) {
@@ -17,17 +33,28 @@ router.post("/", (req, res) => {
     });
   }
 
-  var data = JSON.parse(new TextDecoder().decode(req.body));
+  var img = fs.readFileSync(req.file.path);
+  var encode_image = img.toString("base64");
+  // Define a JSONobject for the image attributes for saving to database
 
-  if (!data.title) {
-    res.status(400).send({ message: "title cannot be empty!" });
-    return;
-  }
+  var finalImg = {
+    contentType: req.file.mimetype,
+    data: Buffer.from(encode_image, "base64"),
+  };
 
-  // Create a ShoppingCart
-  const shoppingCart = new ShoppingCart(data);
+  const shoppingCart = new ShoppingCart({
+    title: req.body.title,
+    description: req.body.description,
+    detailedDescription: req.body.detailedDescription,
+    image: finalImg,
+    category: req.body.category,
+    addToCart: req.body.addToCart,
+    mileage: req.body.mileage,
+    price: req.body.mileage,
+    review: req.body.review,
+    reviewCount: req.body.reviewCount,
+  });
 
-  // Save ShoppingCart in the database
   shoppingCart
     .save(shoppingCart)
     .then((data) => {
@@ -99,16 +126,35 @@ router.get("/:id", (req, res) => {
 });
 
 // Update a Policies with id
-router.put("/:id", (req, res) => {
+router.put("/:id", upload.single("myImage"), (req, res) => {
   if (!req.body) {
     return res.status(400).send({
       message: "Data to update can not be empty!",
     });
   }
 
-  var data = JSON.parse(new TextDecoder().decode(req.body));
+  var img = fs.readFileSync(req.file.path);
+  var encode_image = img.toString("base64");
+
+  var finalImg = {
+    contentType: req.file.mimetype,
+    data: Buffer.from(encode_image, "base64"),
+  };
 
   const id = req.params.id;
+
+  var data = {
+    title: req.body.title,
+    description: req.body.description,
+    detailedDescription: req.body.detailedDescription,
+    image: finalImg,
+    category: req.body.category,
+    addToCart: req.body.addToCart,
+    mileage: req.body.mileage,
+    price: req.body.mileage,
+    review: req.body.review,
+    reviewCount: req.body.reviewCount,
+  };
 
   ShoppingCart.findByIdAndUpdate(id, data, { useFindAndModify: false })
     .then((data) => {

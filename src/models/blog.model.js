@@ -3,7 +3,10 @@ module.exports = (mongoose) => {
     {
       title: String,
       category: String,
-      //image: [{ type: Blob }],
+      image: {
+        data: Buffer,
+        contentType: String,
+      },
       content: [{ type: String }],
       signature: [{ type: String }],
       reviewed: Boolean,

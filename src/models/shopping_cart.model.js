@@ -1,10 +1,15 @@
+const multer = require("multer");
+
 module.exports = (mongoose) => {
   var schema = mongoose.Schema(
     {
       title: String,
       description: String,
       detailedDescription: String,
-      //image: [{ type: Blob }],
+      image: {
+        data: Buffer,
+        contentType: String,
+      },
       category: String,
       addToCart: Boolean,
       mileage: Number,

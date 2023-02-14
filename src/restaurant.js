@@ -7,7 +7,22 @@ const Restaurant = db.restaurant;
 const app = express();
 const router = express.Router();
 
-router.post("/", (req, res) => {
+const fs = require("file-system");
+
+const multer = require("multer");
+
+var storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, "uploads");
+  },
+  filename: function (req, file, cb) {
+    cb(null, file.fieldname + "-" + Date.now());
+  },
+});
+
+var upload = multer({ storage: storage });
+
+router.post("/", upload.single("myImage"), (req, res) => {
   // Validate request
 
   if (!req.body) {
@@ -16,15 +31,28 @@ router.post("/", (req, res) => {
     });
   }
 
-  var data = JSON.parse(new TextDecoder().decode(req.body));
+  var img = fs.readFileSync(req.file.path);
+  var encode_image = img.toString("base64");
+  // Define a JSONobject for the image attributes for saving to database
 
-  if (!data.title) {
-    res.status(400).send({ message: "title cannot be empty!" });
-    return;
-  }
+  var finalImg = {
+    contentType: req.file.mimetype,
+    image: Buffer.from(encode_image, "base64"),
+  };
 
-  // Create a Restaurant
-  const restaurant = new Restaurant(data);
+  const restaurant = new Restaurant({
+    title: req.body.title,
+    description: req.body.description,
+    image: finalImg,
+    category: req.body.category,
+    company: req.body.company,
+    model: req.body.model,
+    yom: req.body.yom,
+    mileage: req.body.mileage,
+    price: req.body.price,
+    review: req.body.review,
+    reviewCount: req.body.reviewCount,
+  });
 
   // Save Restaurant in the database
   restaurant
@@ -57,7 +85,7 @@ router.get("/", (req, res) => {
           id: itm._id,
           title: itm.title,
           description: itmdescription,
-          //image: itm.image,
+          image: itm.image,
           category: itm.category,
           company: itm.company,
           model: itm.model,
@@ -97,18 +125,41 @@ router.get("/:id", (req, res) => {
 });
 
 // Update a Policies with id
-router.put("/:id", (req, res) => {
+router.put("/:id", upload.single("myImage"), (req, res) => {
   if (!req.body) {
     return res.status(400).send({
       message: "Data to update can not be empty!",
     });
   }
 
+  var img = fs.readFileSync(req.file.path);
+  var encode_image = img.toString("base64");
+
+  var finalImg = {
+    contentType: req.file.mimetype,
+    image: Buffer.from(encode_image, "base64"),
+  };
+
   const id = req.params.id;
 
-  var data = JSON.parse(new TextDecoder().decode(req.body));
-
-  Restaurant.findByIdAndUpdate(id, data, { useFindAndModify: false })
+  Restaurant.findByIdAndUpdate(
+    id,
+    {
+      title: req.body.title,
+      description: req.body.description,
+      image: req.body.image,
+      image: finalImg,
+      category: req.body.category,
+      company: req.body.company,
+      model: req.body.model,
+      yom: req.body.yom,
+      mileage: req.body.mileage,
+      price: req.body.price,
+      review: req.body.review,
+      reviewCount: req.body.reviewCount,
+    },
+    { useFindAndModify: false }
+  )
     .then((data) => {
       if (!data) {
         res.status(404).send({
