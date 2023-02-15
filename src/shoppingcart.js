@@ -2,7 +2,7 @@ const express = require("express");
 const serverless = require("serverless-http");
 
 const db = require("./models");
-const Restaurant = db.restaurant;
+const ShoppingCart = db.shoppingcart;
 const router = express.Router();
 
 const cors = require("cors");
@@ -14,7 +14,7 @@ app.use(
   })
 );
 
-// Create a new restaurant
+// Create a new shoppingcart
 router.post("/", (req, res) => {
   debugger;
   if (!req.body) {
@@ -25,21 +25,21 @@ router.post("/", (req, res) => {
 
   let data = JSON.parse(Buffer.from(req.body).toString("utf8"));
 
-  const restaurant = new Restaurant(data);
-  restaurant
-    .save(restaurant)
+  const shoppingcart = new ShoppingCart(data);
+  shoppingcart
+    .save(shoppingcart)
     .then((data) => {
       res.send(data);
     })
     .catch((err) => {
       res.status(500).send({
         message:
-          err.message || "Some error occurred while creating the Restaurant.",
+          err.message || "Some error occurred while creating the ShoppingCart.",
       });
     });
 });
 
-// Retrieve all restaurant
+// Retrieve all shoppingcart
 router.get("/", (req, res) => {
   debugger;
   const title = req.query.title;
@@ -47,25 +47,27 @@ router.get("/", (req, res) => {
     ? { title: { $regex: new RegExp(title), $options: "i" } }
     : {};
 
-  Restaurant.find(condition)
+  ShoppingCart.find(condition)
     .then((data) => {
       res.send(data);
     })
     .catch((err) => {
       res.status(500).send({
         message:
-          err.message || "Some error occurred while retrieving Restaurant.",
+          err.message || "Some error occurred while retrieving ShoppingCart.",
       });
     });
 });
 
-// Retrieve a single restaurant with id
+// Retrieve a single shoppingcart with id
 router.get("/:id", async (req, res) => {
   const id = req.params.id;
-  Restaurant.findById(id)
+  ShoppingCart.findById(id)
     .then((data) => {
       if (!data)
-        res.status(404).send({ message: "Not found Restaurant with id " + id });
+        res
+          .status(404)
+          .send({ message: "Not found ShoppingCart with id " + id });
       else {
         res.send(data);
       }
@@ -73,11 +75,11 @@ router.get("/:id", async (req, res) => {
     .catch((err) => {
       res
         .status(500)
-        .send({ message: "Error retrieving Restaurant with id=" + id });
+        .send({ message: "Error retrieving ShoppingCart with id=" + id });
     });
 });
 
-// Update a restaurant with id
+// Update a shoppingcart with id
 router.put("/:id", (req, res) => {
   if (!req.body) {
     return res.status(400).send({
@@ -88,45 +90,45 @@ router.put("/:id", (req, res) => {
 
   let data = JSON.parse(Buffer.from(req.body).toString("utf8"));
 
-  Restaurant.findByIdAndUpdate(id, data, { useFindAndModify: false })
+  ShoppingCart.findByIdAndUpdate(id, data, { useFindAndModify: false })
     .then((data) => {
       if (!data) {
         res.status(404).send({
-          message: `Cannot update Restaurant with id=${id}. Maybe Restaurant was not found!`,
+          message: `Cannot update ShoppingCart with id=${id}. Maybe ShoppingCart was not found!`,
         });
-      } else res.send({ message: "Restaurant was updated successfully." });
+      } else res.send({ message: "ShoppingCart was updated successfully." });
     })
     .catch((err) => {
       res.status(500).send({
-        message: "Error updating Restaurant with id=" + id,
+        message: "Error updating ShoppingCart with id=" + id,
       });
     });
 });
 
-// Delete a restaurant with id
+// Delete a shoppingcart with id
 router.delete("/:id", (req, res) => {
   const id = req.params.id;
 
-  Restaurant.findByIdAndRemove(id, { useFindAndModify: false })
+  ShoppingCart.findByIdAndRemove(id, { useFindAndModify: false })
     .then((data) => {
       if (!data) {
         res.status(404).send({
-          message: `Cannot delete Restaurant with id=${id}. Maybe Restaurant was not found!`,
+          message: `Cannot delete ShoppingCart with id=${id}. Maybe ShoppingCart was not found!`,
         });
       } else {
         res.send({
-          message: "Restaurant was deleted successfully!",
+          message: "ShoppingCart was deleted successfully!",
         });
       }
     })
     .catch((err) => {
       res.status(500).send({
-        message: "Could not delete Restaurant with id=" + id,
+        message: "Could not delete ShoppingCart with id=" + id,
       });
     });
 });
 
-app.use(`/.netlify/functions/restaurant`, router);
+app.use(`/.netlify/functions/shoppingcart`, router);
 
 module.exports = app;
 module.exports.handler = serverless(app);
