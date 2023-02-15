@@ -3,11 +3,9 @@ const serverless = require("serverless-http");
 
 const db = require("./models");
 const Blog = db.blog;
-
 const router = express.Router();
 
 const cors = require("cors");
-
 const app = express();
 
 app.use(
@@ -16,25 +14,8 @@ app.use(
   })
 );
 
-// app.options("*", cors());
-// app.use(cors());
-
-const fs = require("file-system");
-const multer = require("multer");
-
-var storage = multer.diskStorage({
-  destination: function (req, file, cb) {
-    cb(null, "uploads");
-  },
-  filename: function (req, file, cb) {
-    cb(null, file.fieldname + "-" + Date.now());
-  },
-});
-
-var upload = multer({ storage: storage });
-
 // Create a new blog
-router.post("/", upload.single("myImage"), (req, res) => {
+router.post("/", (req, res) => {
   debugger;
   if (!req.body) {
     return res.status(400).send({
@@ -42,25 +23,9 @@ router.post("/", upload.single("myImage"), (req, res) => {
     });
   }
 
-  var img = fs.readFileSync(req.file.path);
-  var encode_image = img.toString("base64");
-  // Define a JSONobject for the image attributes for saving to database
+  let data = JSON.parse(Buffer.from(req.body).toString("utf8"));
 
-  var finalImg = {
-    contentType: req.file.mimetype,
-    data: Buffer.from(encode_image, "base64"),
-  };
-
-  const blog = new Blog({
-    title: req.body.title,
-    category: req.body.category,
-    image: finalImg,
-    content: req.body.content,
-    signature: req.body.signature,
-    reviewed: req.body.reviewed,
-    approved: req.body.approved,
-  });
-
+  const blog = new Blog(data);
   blog
     .save(blog)
     .then((data) => {
@@ -83,24 +48,7 @@ router.get("/", (req, res) => {
 
   Blog.find(condition)
     .then((data) => {
-      var result = {};
-
-      debugger;
-
-      data.map((itm) => {
-        result[itm.title] = {
-          id: itm._id,
-          title: itm.title,
-          category: itm.category,
-          image: itm.image && itm.image.data && itm.image.data,
-          content: itm.content,
-          signature: itm.signature,
-          reviewed: itm.reviewed,
-          approved: itm.approved,
-        };
-      });
-
-      res.send(result);
+      res.send(data);
     })
     .catch((err) => {
       res.status(500).send({
@@ -110,27 +58,14 @@ router.get("/", (req, res) => {
 });
 
 // Retrieve a single blog with id
-router.get("/:id", (req, res) => {
+router.get("/:id", async (req, res) => {
   const id = req.params.id;
-  debugger;
   Blog.findById(id)
     .then((data) => {
       if (!data)
         res.status(404).send({ message: "Not found Blog with id " + id });
       else {
-        debugger;
-        var result = {
-          id: data._id.toString(),
-          title: data.title,
-          category: data.category,
-          image: data.image && data.image.data && data.image.data,
-          content: data.content,
-          signature: data.signature,
-          reviewed: data.reviewed,
-          approved: data.approved,
-        };
-
-        res.send(result);
+        res.send(data);
       }
     })
     .catch((err) => {
@@ -145,26 +80,9 @@ router.put("/:id", (req, res) => {
       message: "Data to update can not be empty!",
     });
   }
-
   const id = req.params.id;
 
-  var img = fs.readFileSync(req.file.path);
-  var encode_image = img.toString("base64");
-
-  var finalImg = {
-    contentType: req.file.mimetype,
-    image: Buffer.from(encode_image, "base64"),
-  };
-
-  let data = {
-    title: req.body.title,
-    category: req.body.category,
-    image: finalImg,
-    content: req.body.content,
-    signature: req.body.signature,
-    reviewed: req.body.reviewed,
-    approved: req.body.approved,
-  };
+  let data = JSON.parse(Buffer.from(req.body).toString("utf8"));
 
   Blog.findByIdAndUpdate(id, data, { useFindAndModify: false })
     .then((data) => {

@@ -6,10 +6,7 @@ module.exports = (mongoose) => {
       title: String,
       description: String,
       detailedDescription: String,
-      image: {
-        data: Buffer,
-        contentType: String,
-      },
+      imagestr: String, //image as base 64
       category: String,
       addToCart: Boolean,
       mileage: Number,
