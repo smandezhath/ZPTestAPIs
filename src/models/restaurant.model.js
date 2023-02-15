@@ -3,7 +3,7 @@ module.exports = (mongoose) => {
     {
       title: String,
       description: String,
-      //image: [{ type: Blob }],
+      imagestr: String, //image as base 64
       category: String,
       company: String,
       model: String,

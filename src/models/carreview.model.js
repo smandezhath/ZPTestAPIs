@@ -4,7 +4,7 @@ module.exports = (mongoose) => {
       title: String,
       star_rating: Number,
       rating_count: Number,
-      //image: [{ type: Blob }],
+      imagestr: String, //image as base 64
       description: String,
       category: String,
       bhp: Number,

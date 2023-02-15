@@ -1,12 +1,9 @@
 module.exports = (mongoose) => {
-  var schema = mongoose.Schema(
+  var schema = new mongoose.Schema(
     {
       title: String,
       category: String,
-      image: {
-        data: Buffer,
-        contentType: String,
-      },
+      imagestr: String, //image as base 64
       content: [{ type: String }],
       signature: [{ type: String }],
       reviewed: Boolean,
@@ -15,12 +12,12 @@ module.exports = (mongoose) => {
     { timestamps: true }
   );
 
-  schema.method("toJSON", function () {
-    const { __v, _id, ...object } = this.toObject();
-    object.id = _id;
-    return object;
-  });
+  // schema.method("toJSON", function () {
+  //   const { __v, _id, ...object } = this.toObject();
+  //   object.id = _id;
+  //   return object;
+  // });
 
-  const blog = mongoose.model("blog", schema);
+  const blog = new mongoose.model("blog", schema);
   return blog;
 };
