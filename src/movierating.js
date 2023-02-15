@@ -4,10 +4,18 @@ const express = require("express");
 const serverless = require("serverless-http");
 
 const db = require("./models");
+const cors = require("cors");
+
 const Movierating = db.movierating;
 
 const app = express();
 const router = express.Router();
+
+app.use(
+  cors({
+    origin: "*",
+  })
+);
 
 router.post("/", (req, res) => {
   // Validate request
@@ -18,12 +26,7 @@ router.post("/", (req, res) => {
     });
   }
 
-  var data = JSON.parse(new TextDecoder().decode(req.body));
-
-  if (!data.title) {
-    res.status(400).send({ message: "title cannot be empty!" });
-    return;
-  }
+  var data = JSON.parse(Buffer.from(req.body).toString("utf8"));
 
   // Create a Movierating
   const movierating = new Movierating(data);
@@ -103,7 +106,7 @@ router.put("/:id", (req, res) => {
   }
 
   const id = req.params.id;
-  var data = JSON.parse(new TextDecoder().decode(req.body));
+  var data = JSON.parse(Buffer.from(req.body).toString("utf8"));
 
   Movierating.findByIdAndUpdate(id, data, { useFindAndModify: false })
     .then((data) => {
