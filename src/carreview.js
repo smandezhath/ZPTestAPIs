@@ -10,20 +10,14 @@ const router = express.Router();
 router.post("/", (req, res) => {
   // Validate request
 
-  debugger;
-
   if (!req.body) {
     return res.status(400).send({
       message: "Data can not be empty!",
     });
   }
 
-  var data = JSON.parse(new TextDecoder().decode(req.body));
+  var data = JSON.parse(Buffer.from(req.body).toString("utf8"));
 
-  if (!data.title) {
-    res.status(400).send({ message: "title cannot be empty!" });
-    return;
-  }
   // Create a CarReview
   const carreview = new CarReview(data);
 
@@ -49,24 +43,7 @@ router.get("/", (req, res) => {
 
   CarReview.find(condition)
     .then((data) => {
-      var result = {};
-
-      data.map((itm) => {
-        result[itm.title] = {
-          id: itm._id,
-          title: itm.title,
-          star_rating: itm.star_rating,
-          rating_count: itm.rating_count,
-          // // image: req.body.image,
-          description: itm.description,
-          category: itm.category,
-          bhp: itm.bhp,
-          mileage: itm.mileage,
-          fuel: itm.fuel,
-        };
-      });
-
-      res.send(result);
+      res.send(data);
     })
     .catch((err) => {
       res.status(500).send({
@@ -101,7 +78,7 @@ router.put("/:id", (req, res) => {
 
   const id = req.params.id;
 
-  var data = JSON.parse(new TextDecoder().decode(req.body));
+  JSON.parse(Buffer.from(req.body).toString("utf8"));
 
   CarReview.findByIdAndUpdate(id, data, { useFindAndModify: false })
     .then((data) => {
