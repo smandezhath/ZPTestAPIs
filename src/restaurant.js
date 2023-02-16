@@ -24,36 +24,15 @@ var upload = multer({ storage: storage });
 
 router.post("/", upload.single("myImage"), (req, res) => {
   // Validate request
-
   if (!req.body) {
     return res.status(400).send({
       message: "Data can not be empty!",
     });
   }
 
-  var img = fs.readFileSync(req.file.path);
-  var encode_image = img.toString("base64");
-  // Define a JSONobject for the image attributes for saving to database
+  var data = JSON.parse(Buffer.from(req.body).toString("utf8"));
 
-  var finalImg = {
-    contentType: req.file.mimetype,
-    image: Buffer.from(encode_image, "base64"),
-  };
-
-  const restaurant = new Restaurant({
-    title: req.body.title,
-    description: req.body.description,
-    image: finalImg,
-    category: req.body.category,
-    company: req.body.company,
-    model: req.body.model,
-    yom: req.body.yom,
-    mileage: req.body.mileage,
-    price: req.body.price,
-    review: req.body.review,
-    reviewCount: req.body.reviewCount,
-  });
-
+  const restaurant = new Restaurant(data);
   // Save Restaurant in the database
   restaurant
     .save(restaurant)
@@ -78,26 +57,7 @@ router.get("/", (req, res) => {
 
   Restaurant.find(condition)
     .then((data) => {
-      var result = {};
-
-      data.map((itm) => {
-        result[itm.title] = {
-          id: itm._id,
-          title: itm.title,
-          description: itmdescription,
-          image: itm.image,
-          category: itm.category,
-          company: itm.company,
-          model: itm.model,
-          yom: itm.yom,
-          mileage: itm.mileage,
-          price: itm.price,
-          review: itm.review,
-          reviewCount: itm.reviewCount,
-        };
-      });
-
-      res.send(result);
+      res.send(data);
     })
     .catch((err) => {
       res.status(500).send({
@@ -132,34 +92,10 @@ router.put("/:id", upload.single("myImage"), (req, res) => {
     });
   }
 
-  var img = fs.readFileSync(req.file.path);
-  var encode_image = img.toString("base64");
-
-  var finalImg = {
-    contentType: req.file.mimetype,
-    image: Buffer.from(encode_image, "base64"),
-  };
-
   const id = req.params.id;
+  var data = JSON.parse(Buffer.from(req.body).toString("utf8"));
 
-  Restaurant.findByIdAndUpdate(
-    id,
-    {
-      title: req.body.title,
-      description: req.body.description,
-      image: req.body.image,
-      image: finalImg,
-      category: req.body.category,
-      company: req.body.company,
-      model: req.body.model,
-      yom: req.body.yom,
-      mileage: req.body.mileage,
-      price: req.body.price,
-      review: req.body.review,
-      reviewCount: req.body.reviewCount,
-    },
-    { useFindAndModify: false }
-  )
+  Restaurant.findByIdAndUpdate(id, data, { useFindAndModify: false })
     .then((data) => {
       if (!data) {
         res.status(404).send({

@@ -26,6 +26,6 @@ db.blog = require("./blog.model.js")(mongoose);
 db.carreview = require("./carreview.model.js")(mongoose);
 db.restaurant = require("./restaurant.model.js")(mongoose);
 db.movierating = require("./movierating.model.js")(mongoose);
-db.shopping_cart = require("./shopping_cart.model.js")(mongoose);
+db.shoppingcart = require("./shoppingcart.model.js")(mongoose);
 
 module.exports = db;
