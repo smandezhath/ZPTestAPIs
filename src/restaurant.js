@@ -3,37 +3,29 @@ const serverless = require("serverless-http");
 
 const db = require("./models");
 const Restaurant = db.restaurant;
-
-const app = express();
 const router = express.Router();
 
-const fs = require("file-system");
+const cors = require("cors");
+const app = express();
 
-const multer = require("multer");
+app.use(
+  cors({
+    origin: "*",
+  })
+);
 
-var storage = multer.diskStorage({
-  destination: function (req, file, cb) {
-    cb(null, "uploads");
-  },
-  filename: function (req, file, cb) {
-    cb(null, file.fieldname + "-" + Date.now());
-  },
-});
-
-var upload = multer({ storage: storage });
-
-router.post("/", upload.single("myImage"), (req, res) => {
-  // Validate request
+// Create a new restaurant
+router.post("/", (req, res) => {
+  debugger;
   if (!req.body) {
     return res.status(400).send({
       message: "Data can not be empty!",
     });
   }
 
-  var data = JSON.parse(Buffer.from(req.body).toString("utf8"));
+  let data = JSON.parse(Buffer.from(req.body).toString("utf8"));
 
   const restaurant = new Restaurant(data);
-  // Save Restaurant in the database
   restaurant
     .save(restaurant)
     .then((data) => {
@@ -47,7 +39,7 @@ router.post("/", upload.single("myImage"), (req, res) => {
     });
 });
 
-// Retrieve all Policies
+// Retrieve all restaurant
 router.get("/", (req, res) => {
   debugger;
   const title = req.query.title;
@@ -67,15 +59,16 @@ router.get("/", (req, res) => {
     });
 });
 
-// Retrieve a single Policy with id
-router.get("/:id", (req, res) => {
+// Retrieve a single restaurant with id
+router.get("/:id", async (req, res) => {
   const id = req.params.id;
-
   Restaurant.findById(id)
     .then((data) => {
       if (!data)
         res.status(404).send({ message: "Not found Restaurant with id " + id });
-      else res.send(data);
+      else {
+        res.send(data);
+      }
     })
     .catch((err) => {
       res
@@ -84,16 +77,16 @@ router.get("/:id", (req, res) => {
     });
 });
 
-// Update a Policies with id
-router.put("/:id", upload.single("myImage"), (req, res) => {
+// Update a restaurant with id
+router.put("/:id", (req, res) => {
   if (!req.body) {
     return res.status(400).send({
       message: "Data to update can not be empty!",
     });
   }
-
   const id = req.params.id;
-  var data = JSON.parse(Buffer.from(req.body).toString("utf8"));
+
+  let data = JSON.parse(Buffer.from(req.body).toString("utf8"));
 
   Restaurant.findByIdAndUpdate(id, data, { useFindAndModify: false })
     .then((data) => {
@@ -110,7 +103,7 @@ router.put("/:id", upload.single("myImage"), (req, res) => {
     });
 });
 
-// Delete a Policies with id
+// Delete a restaurant with id
 router.delete("/:id", (req, res) => {
   const id = req.params.id;
 
