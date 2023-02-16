@@ -10,6 +10,8 @@ const router = express.Router();
 router.post("/", (req, res) => {
   // Validate request
 
+  debugger;
+
   if (!req.body) {
     return res.status(400).send({
       message: "Data can not be empty!",

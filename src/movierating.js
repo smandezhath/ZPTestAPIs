@@ -54,21 +54,7 @@ router.get("/", (req, res) => {
 
   Movierating.find(condition)
     .then((data) => {
-      var result = {};
-
-      data.map((itm) => {
-        result[itm.title] = {
-          id: itm._id,
-          title: itm.title,
-          star_rating: itm.star_rating,
-          rating_count: itm.rating_count,
-          // Image
-          description: itm.description,
-          category: itm.Category,
-        };
-      });
-
-      res.send(result);
+      res.send(data);
     })
     .catch((err) => {
       res.status(500).send({

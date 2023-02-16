@@ -2,16 +2,13 @@ module.exports = (mongoose) => {
   var schema = mongoose.Schema(
     {
       title: String,
-      description: String,
+      starrating: String,
+      ratingcount: String,
       imagestr: String, //image as base 64
+      description: String,
       category: String,
-      company: String,
-      model: String,
-      yom: String,
-      mileage: Number,
-      price: Number,
-      review: Number,
-      reviewCount: Number,
+      place: String,
+      district: String,
     },
     { timestamps: true }
   );

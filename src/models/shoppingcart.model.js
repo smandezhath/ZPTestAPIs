@@ -4,15 +4,13 @@ module.exports = (mongoose) => {
   var schema = mongoose.Schema(
     {
       title: String,
-      description: String,
-      detailedDescription: String,
-      imagestr: String, //image as base 64
-      category: String,
-      addToCart: Boolean,
-      mileage: Number,
       price: Number,
-      review: Number,
-      reviewCount: Number,
+      starrating: Number,
+      ratingcount: Number,
+      imagestr: String, //image as base 64
+      description: String,
+      category: String,
+      itemcount: Number,
     },
     { timestamps: true }
   );
