@@ -22,6 +22,7 @@ db.mongoose
     process.exit();
   });
 
+db.account = require("./account.model.js")(mongoose);
 db.blog = require("./blog.model.js")(mongoose);
 db.carreview = require("./carreview.model.js")(mongoose);
 db.restaurant = require("./restaurant.model.js")(mongoose);
