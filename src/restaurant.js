@@ -40,22 +40,44 @@ router.post("/", (req, res) => {
 });
 
 // Retrieve all restaurant
+// router.get("/", (req, res) => {
+//   debugger;
+//   const title = req.query.title;
+//   var condition = title
+//     ? { title: { $regex: new RegExp(title), $options: "i" } }
+//     : {};
+
+//   Restaurant.find(condition)
+//     .then((data) => {
+//       res.send(data);
+//     })
+//     .catch((err) => {
+//       res.status(500).send({
+//         message:
+//           err.message || "Some error occurred while retrieving Restaurant.",
+//       });
+//     });
+// });
+
 router.get("/", (req, res) => {
-  debugger;
   const title = req.query.title;
   var condition = title
     ? { title: { $regex: new RegExp(title), $options: "i" } }
     : {};
-
-  Restaurant.find(condition)
+    Restaurant.find(condition)
     .then((data) => {
-      res.send(data);
+      debugger;
+      var result = data.map((ele) => {
+        return { id: ele._id };
+      });
+      res.send(result);
     })
     .catch((err) => {
-      res.status(500).send({
-        message:
-          err.message || "Some error occurred while retrieving Restaurant.",
-      });
+      res
+        .status(500)
+        .send({
+          message: err.message || "Some error occurred while retrieving Restaurant.",
+        });
     });
 });
 

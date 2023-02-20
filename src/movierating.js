@@ -46,21 +46,43 @@ router.post("/", (req, res) => {
 });
 
 // Retrieve all car review
+// router.get("/", (req, res) => {
+//   const title = req.query.title;
+//   var condition = title
+//     ? { title: { $regex: new RegExp(title), $options: "i" } }
+//     : {};
+
+//   Movierating.find(condition)
+//     .then((data) => {
+//       res.send(data);
+//     })
+//     .catch((err) => {
+//       res.status(500).send({
+//         message:
+//           err.message || "Some error occurred while retrieving Movierating.",
+//       });
+//     });
+// });
+
 router.get("/", (req, res) => {
   const title = req.query.title;
   var condition = title
     ? { title: { $regex: new RegExp(title), $options: "i" } }
     : {};
-
-  Movierating.find(condition)
+    Movierating.find(condition)
     .then((data) => {
-      res.send(data);
+      debugger;
+      var result = data.map((ele) => {
+        return { id: ele._id };
+      });
+      res.send(result);
     })
     .catch((err) => {
-      res.status(500).send({
-        message:
-          err.message || "Some error occurred while retrieving Movierating.",
-      });
+      res
+        .status(500)
+        .send({
+          message: err.message || "Some error occurred while retrieving Movierating.",
+        });
     });
 });
 
