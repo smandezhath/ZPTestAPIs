@@ -45,10 +45,13 @@ router.get("/", (req, res) => {
   var condition = title
     ? { title: { $regex: new RegExp(title), $options: "i" } }
     : {};
-
   Blog.find(condition)
     .then((data) => {
-      res.send(data);
+      debugger;
+      var result = data.map((ele) => {
+        return { id: ele._id };
+      });
+      res.send(result);
     })
     .catch((err) => {
       res.status(500).send({
