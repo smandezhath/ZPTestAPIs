@@ -37,21 +37,43 @@ router.post("/", (req, res) => {
     });
 });
 
+// router.get("/", (req, res) => {
+//   const title = req.query.title;
+//   var condition = title
+//     ? { title: { $regex: new RegExp(title), $options: "i" } }
+//     : {};
+
+//   CarReview.find(condition)
+//     .then((data) => {
+//       res.send(data);
+//     })
+//     .catch((err) => {
+//       res.status(500).send({
+//         message:
+//           err.message || "Some error occurred while retrieving CarReview.",
+//       });
+//     });
+// });
+
 router.get("/", (req, res) => {
   const title = req.query.title;
   var condition = title
     ? { title: { $regex: new RegExp(title), $options: "i" } }
     : {};
-
-  CarReview.find(condition)
+    CarReview.find(condition)
     .then((data) => {
-      res.send(data);
+      debugger;
+      var result = data.map((ele) => {
+        return { id: ele._id };
+      });
+      res.send(result);
     })
     .catch((err) => {
-      res.status(500).send({
-        message:
-          err.message || "Some error occurred while retrieving CarReview.",
-      });
+      res
+        .status(500)
+        .send({
+          message: err.message || "Some error occurred while retrieving CarReview.",
+        });
     });
 });
 
