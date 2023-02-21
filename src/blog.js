@@ -49,7 +49,12 @@ router.get("/", (req, res) => {
     .then((data) => {
       debugger;
       var result = data.map((ele) => {
-        return { id: ele._id };
+        return {
+          id: ele._id,
+          approved: ele.approved,
+          reviewed: ele.reviewed,
+          signature: ele.signature,
+        };
       });
       res.send(result);
     })
