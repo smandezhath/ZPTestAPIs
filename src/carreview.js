@@ -4,8 +4,17 @@ const serverless = require("serverless-http");
 const db = require("./models");
 const CarReview = db.carreview;
 
-const app = express();
+// const app = express();
 const router = express.Router();
+
+const cors = require("cors");
+const app = express();
+
+app.use(
+  cors({
+    origin: "*",
+  })
+);
 
 router.post("/", (req, res) => {
   // Validate request
